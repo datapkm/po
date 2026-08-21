@@ -31,13 +31,13 @@
         }
 
         /* ========================================= */
-        /* FLOATING BANNER ANIMASI                   */
+        /* FLOATING BANNER DI ATAS (SLIDE DOWN)      */
         /* ========================================= */
         #apk-banner {
             position: fixed;
-            bottom: 20px; /* Mengambang di bawah */
+            top: 20px; /* Posisi di atas layar */
             left: 50%;
-            transform: translate(-50%, 150px); /* Posisi awal tersembunyi di bawah */
+            transform: translate(-50%, -150px); /* Posisi awal tersembunyi di atas */
             opacity: 0;
             width: 90%;
             max-width: 400px;
@@ -127,21 +127,19 @@
 
     <!-- IFRAME APLIKASI GAS DENGAN IZIN KAMERA & LOKASI -->
     <div id="iframe-container">
-        <!-- PERBAIKAN: Penambahan allow="camera; geolocation; microphone" -->
         <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec" 
                 allow="camera; geolocation; microphone; fullscreen" 
                 allowfullscreen>
         </iframe>
     </div>
 
-    <!-- FLOATING BANNER APK -->
+    <!-- FLOATING BANNER APK DI ATAS -->
     <div id="apk-banner">
         <div class="banner-text">
             <div class="banner-title">Instal Aplikasi</div>
             <div class="banner-desc">Lebih cepat & hemat kuota</div>
         </div>
         <div class="banner-actions">
-            <!-- Sesuaikan nama file APK Anda di href -->
             <a href="./app.apk" id="btn-download-apk" download class="btn-download">Unduh</a>
             <button id="btn-close-apk" class="btn-close" aria-label="Tutup">&times;</button>
         </div>
@@ -155,47 +153,41 @@
             });
         }
 
-        // 2. Logika Deteksi dan Animasi Popup
+        // 2. Logika Deteksi, Animasi Popup, dan Timer 10 Detik
         document.addEventListener('DOMContentLoaded', () => {
             const banner = document.getElementById('apk-banner');
             const btnClose = document.getElementById('btn-close-apk');
             const btnDownload = document.getElementById('btn-download-apk');
 
-            // Deteksi Lingkungan
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const isAndroid = /android/i.test(userAgent);
-            
-            // Deteksi jika dibuka dari APK WebView Android Studio Anda (Sangat Penting)
             const isAPK = userAgent.includes("PuskesmasApp-APK");
-            
-            // Deteksi jika dibuka dari layar utama HP (PWA/Standalone)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-
-            // Cek apakah user pernah menutup banner ini (Disimpan di browser HP)
             const isDismissed = localStorage.getItem('apkBannerDismissed');
 
-            // TAMPILKAN BANNER HANYA JIKA: 
-            // 1. HP Android
-            // 2. Bukan di dalam APK
-            // 3. Bukan PWA (Layar utama)
-            // 4. Belum pernah ditutup
+            let autoCloseTimer = null;
+
+            const hideBanner = () => {
+                banner.classList.remove('show');
+                if (autoCloseTimer) clearTimeout(autoCloseTimer);
+                localStorage.setItem('apkBannerDismissed', 'true');
+            };
+
             if (isAndroid && !isAPK && !isStandalone && !isDismissed) {
-                // Munculkan popup dengan jeda 2 detik agar aplikasi web load terlebih dahulu
+                // Munculkan popup setelah 2 detik halaman dimuat
                 setTimeout(() => {
                     banner.classList.add('show');
+
+                    // OTOMATIS HILANG SETELAH 10 DETIK
+                    autoCloseTimer = setTimeout(() => {
+                        hideBanner();
+                    }, 10000); // 10.000 milidetik = 10 detik
+
                 }, 2000); 
             }
 
-            // Fungsi untuk menyembunyikan banner dan menyimpannya di memori
-            const hideBanner = () => {
-                banner.classList.remove('show');
-                localStorage.setItem('apkBannerDismissed', 'true'); // Tidak akan muncul lagi di HP ini
-            };
-
-            // Event Listeners
             btnClose.addEventListener('click', hideBanner);
             
-            // Jika tombol unduh diklik, otomatis hilangkan popup
             btnDownload.addEventListener('click', () => {
                 setTimeout(hideBanner, 500); 
             });

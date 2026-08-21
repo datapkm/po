@@ -12,18 +12,48 @@
 </head>
 <body>
 
-  <!-- Tempel URL Web App Google Apps Script Anda di src -->
+  <!-- 1. IFRAME APLIKASI GOOGLE APPS SCRIPT ANDA -->
   <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec"></iframe>
 
+  <!-- 2. KODE HTML BANNER DOWNLOAD APK (Opsi 2) -->
+  <div id="apk-download-banner" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: #28a745; color: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; text-align: center;">
+    <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">Unduh Aplikasi Android Resmi untuk pengalaman terbaik!</p>
+    
+    <!-- Pastikan nama file APK sesuai dengan yang di-upload di GitHub -->
+    <a href="./presensi_puskesmas.apk" download style="display: inline-block; background: white; color: #28a745; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold;">Download APK</a>
+    <button id="btn-close-apk" style="background: transparent; color: white; border: none; padding: 8px 12px; margin-left: 8px; cursor: pointer;">Tutup</button>
+  </div>
+
+  <!-- 3. KODE SCRIPT REGISTRASI & PENGONTROL BANNER -->
   <script>
     // Registrasi Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('Service Worker Berhasil Didaftarkan:', reg.scope))
-          .catch((err) => console.error('Gagal Registrasi Service Worker:', err));
+          .then((reg) => console.log('Service Worker Berhasil:', reg.scope))
+          .catch((err) => console.error('Gagal Service Worker:', err));
       });
     }
+
+    // Logika Menampilkan Pop-Up APK khusus Perangkat Android
+    window.addEventListener('load', () => {
+      const apkBanner = document.getElementById('apk-download-banner');
+      const btnCloseApk = document.getElementById('btn-close-apk');
+
+      // Deteksi pengguna Android
+      const isAndroid = /Android/i.test(navigator.userAgent);
+
+      // Tampilkan banner jika diakses lewat HP Android dan belum pernah ditutup
+      if (isAndroid && !sessionStorage.getItem('apkBannerDismissed')) {
+        apkBanner.style.display = 'block';
+      }
+
+      btnCloseApk.addEventListener('click', () => {
+        apkBanner.style.display = 'none';
+        sessionStorage.setItem('apkBannerDismissed', 'true');
+      });
+    });
   </script>
+
 </body>
 </html>

@@ -1,104 +1,206 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Presensi Online</title>
-  <link rel="manifest" href="./manifest.json">
-  <style>
-    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
-    
-    /* Header Bar Hitam Simpel */
-    #apk-top-bar {
-      display: none;
-      background: #111111;
-      color: #ffffff;
-      padding: 8px 15px;
-      font-size: 13px;
-      box-sizing: border-box;
-    }
-    
-    .bar-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistem Presensi Online</title>
+    <link rel="manifest" href="./manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; 
+        }
 
-    .btn-download {
-      background: #ffffff;
-      color: #000000;
-      text-decoration: none;
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 12px;
-    }
+        /* Container Iframe (Penuh 100%) */
+        #iframe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
 
-    .btn-close {
-      background: none;
-      border: none;
-      color: #888888;
-      font-size: 16px;
-      margin-left: 10px;
-      cursor: pointer;
-    }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
-    /* Container untuk Iframe */
-    #iframe-container {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+        /* ========================================= */
+        /* FLOATING BANNER ANIMASI                   */
+        /* ========================================= */
+        #apk-banner {
+            position: fixed;
+            bottom: 20px; /* Mengambang di bawah */
+            left: 50%;
+            transform: translate(-50%, 150px); /* Posisi awal tersembunyi di bawah */
+            opacity: 0;
+            width: 90%;
+            max-width: 400px;
+            background: rgba(15, 23, 42, 0.95); /* Warna Slate-900 elegan */
+            backdrop-filter: blur(8px);
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek memantul halus */
+            z-index: 9999;
+            pointer-events: none; /* Nonaktifkan klik saat tersembunyi */
+        }
+
+        #apk-banner.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .banner-text {
+            flex: 1;
+        }
+
+        .banner-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #5eead4; /* Warna Teal Terang */
+            margin-bottom: 2px;
+        }
+
+        .banner-desc {
+            font-size: 11px;
+            color: #cbd5e1;
+            line-height: 1.4;
+        }
+
+        .banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download {
+            background: #0d9488; /* Warna Teal 600 */
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background 0.3s;
+        }
+
+        .btn-download:active {
+            background: #0f766e;
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #cbd5e1;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .btn-close:active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- HEADER BAR HITAM -->
-  <div id="apk-top-bar">
-    <div class="bar-container">
-      <span>Gunakan aplikasi untuk pengalaman lebih cepat</span>
-      <div>
-        <!-- Sesuaikan nama file APK Anda -->
-        <a href="./app.apk" download class="btn-download">Unduh Aplikasi</a>
-        <button id="btn-close-apk" class="btn-close">&times;</button>
-      </div>
+    <!-- IFRAME APLIKASI GAS DENGAN IZIN KAMERA & LOKASI -->
+    <div id="iframe-container">
+        <!-- PERBAIKAN: Penambahan allow="camera; geolocation; microphone" -->
+        <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec" 
+                allow="camera; geolocation; microphone; fullscreen" 
+                allowfullscreen>
+        </iframe>
     </div>
-  </div>
 
-  <!-- IFRAME APLIKASI GAS -->
-  <div id="iframe-container">
-    <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec" style="width:100%; height:100%; border:none;" allow="geolocation"></iframe>
-  </div>
+    <!-- FLOATING BANNER APK -->
+    <div id="apk-banner">
+        <div class="banner-text">
+            <div class="banner-title">Instal Aplikasi</div>
+            <div class="banner-desc">Lebih cepat & hemat kuota</div>
+        </div>
+        <div class="banner-actions">
+            <!-- Sesuaikan nama file APK Anda di href -->
+            <a href="./app.apk" id="btn-download-apk" download class="btn-download">Unduh</a>
+            <button id="btn-close-apk" class="btn-close" aria-label="Tutup">&times;</button>
+        </div>
+    </div>
 
-  <script>
-    // Registrasi Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.error(err));
-      });
-    }
+    <script>
+        // 1. Registrasi Service Worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(err => console.error("Service Worker Error:", err));
+            });
+        }
 
-    // Tampilkan Header hanya jika di HP Android
-    window.addEventListener('load', () => {
-      const topBar = document.getElementById('apk-top-bar');
-      const iframeContainer = document.getElementById('iframe-container');
-      const btnClose = document.getElementById('btn-close-apk');
-      const isAndroid = /Android/i.test(navigator.userAgent);
+        // 2. Logika Deteksi dan Animasi Popup
+        document.addEventListener('DOMContentLoaded', () => {
+            const banner = document.getElementById('apk-banner');
+            const btnClose = document.getElementById('btn-close-apk');
+            const btnDownload = document.getElementById('btn-download-apk');
 
-      if (isAndroid && !sessionStorage.getItem('apkBarDismissed')) {
-        topBar.style.display = 'block';
-        // Sesuaikan tinggi iframe agar tidak terpotong header
-        iframeContainer.style.height = 'calc(100% - ' + topBar.offsetHeight + 'px)';
-      }
+            // Deteksi Lingkungan
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroid = /android/i.test(userAgent);
+            
+            // Deteksi jika dibuka dari APK WebView Android Studio Anda (Sangat Penting)
+            const isAPK = userAgent.includes("PuskesmasApp-APK");
+            
+            // Deteksi jika dibuka dari layar utama HP (PWA/Standalone)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
-      btnClose.addEventListener('click', () => {
-        topBar.style.display = 'none';
-        iframeContainer.style.height = '100%';
-        sessionStorage.setItem('apkBarDismissed', 'true');
-      });
-    });
-  </script>
+            // Cek apakah user pernah menutup banner ini (Disimpan di browser HP)
+            const isDismissed = localStorage.getItem('apkBannerDismissed');
+
+            // TAMPILKAN BANNER HANYA JIKA: 
+            // 1. HP Android
+            // 2. Bukan di dalam APK
+            // 3. Bukan PWA (Layar utama)
+            // 4. Belum pernah ditutup
+            if (isAndroid && !isAPK && !isStandalone && !isDismissed) {
+                // Munculkan popup dengan jeda 2 detik agar aplikasi web load terlebih dahulu
+                setTimeout(() => {
+                    banner.classList.add('show');
+                }, 2000); 
+            }
+
+            // Fungsi untuk menyembunyikan banner dan menyimpannya di memori
+            const hideBanner = () => {
+                banner.classList.remove('show');
+                localStorage.setItem('apkBannerDismissed', 'true'); // Tidak akan muncul lagi di HP ini
+            };
+
+            // Event Listeners
+            btnClose.addEventListener('click', hideBanner);
+            
+            // Jika tombol unduh diklik, otomatis hilangkan popup
+            btnDownload.addEventListener('click', () => {
+                setTimeout(hideBanner, 500); 
+            });
+        });
+    </script>
 
 </body>
 </html>

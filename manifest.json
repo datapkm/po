@@ -1,8 +1,11 @@
 {
+  "id": "/po/",
   "name": "Presensi Online",
   "short_name": "Presensi",
-  "start_url": "./",
+  "description": "Aplikasi Sistem Presensi Online untuk mencatat kehadiran, pengajuan izin, dan riwayat presensi pegawai.",
+  "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#4a90e2",
   "icons": [
@@ -15,6 +18,22 @@
       "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tampilan Utama Presensi"
+    },
+    {
+      "src": "./screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tampilan Desktop Presensi"
     }
   ]
 }

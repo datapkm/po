@@ -1,23 +1,23 @@
 const CACHE_NAME = 'presensi-pwa-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// Install Service Worker & Caching File Utama
+// Install & Simpan Aset Statis Ke Cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();
 });
 
-// Aktivasi Service Worker & Hapus Cache Lama
+// Aktivasi & Hapus Cache Versi Lama
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -33,14 +33,22 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch Strategy: Network First, Fallback to Cache
+// Logika Caching saat Fetch Data
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
-        return response;
+      .then((networkResponse) => {
+        // Jika request sukses dari jaringan, simpan salinannya di cache
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
       })
       .catch(() => {
+        // Jika jaringan gagal/offline, ambil dari cache
         return caches.match(event.request);
       })
   );

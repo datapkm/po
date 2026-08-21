@@ -6,51 +6,96 @@
   <title>Sistem Presensi Online</title>
   <link rel="manifest" href="./manifest.json">
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-    iframe { width: 100%; height: 100%; border: none; }
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
+    
+    /* Header Bar Hitam Simpel */
+    #apk-top-bar {
+      display: none;
+      background: #111111;
+      color: #ffffff;
+      padding: 8px 15px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    
+    .bar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .btn-download {
+      background: #ffffff;
+      color: #000000;
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: #888888;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    /* Container untuk Iframe */
+    #iframe-container {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. IFRAME APLIKASI GOOGLE APPS SCRIPT ANDA -->
-  <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec"></iframe>
-
-  <!-- 2. KODE HTML BANNER DOWNLOAD APK (Opsi 2) -->
-  <div id="apk-download-banner" style="display: none; position: fixed; bottom: 20px; left: 20px; right: 20px; background: #28a745; color: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999; text-align: center;">
-    <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 500;">Unduh Aplikasi Android Resmi untuk pengalaman terbaik!</p>
-    
-    <!-- Pastikan nama file APK sesuai dengan yang di-upload di GitHub -->
-    <a href="./presensi_puskesmas.apk" download style="display: inline-block; background: white; color: #28a745; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: bold;">Download APK</a>
-    <button id="btn-close-apk" style="background: transparent; color: white; border: none; padding: 8px 12px; margin-left: 8px; cursor: pointer;">Tutup</button>
+  <!-- HEADER BAR HITAM -->
+  <div id="apk-top-bar">
+    <div class="bar-container">
+      <span>Gunakan aplikasi untuk pengalaman lebih cepat</span>
+      <div>
+        <!-- Sesuaikan nama file APK Anda -->
+        <a href="./app.apk" download class="btn-download">Unduh Aplikasi</a>
+        <button id="btn-close-apk" class="btn-close">&times;</button>
+      </div>
+    </div>
   </div>
 
-  <!-- 3. KODE SCRIPT REGISTRASI & PENGONTROL BANNER -->
+  <!-- IFRAME APLIKASI GAS -->
+  <div id="iframe-container">
+    <iframe src="https://script.google.com/macros/s/AKfycbw_lUQnEfFm8mplN-MvXcSwxuKJYSj28rRXZS0enMGw6XX6qPVAZxc3ZCYoYtxRphgx/exec" style="width:100%; height:100%; border:none;"></iframe>
+  </div>
+
   <script>
     // Registrasi Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('Service Worker Berhasil:', reg.scope))
-          .catch((err) => console.error('Gagal Service Worker:', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.error(err));
       });
     }
 
-    // Logika Menampilkan Pop-Up APK khusus Perangkat Android
+    // Tampilkan Header hanya jika di HP Android
     window.addEventListener('load', () => {
-      const apkBanner = document.getElementById('apk-download-banner');
-      const btnCloseApk = document.getElementById('btn-close-apk');
-
-      // Deteksi pengguna Android
+      const topBar = document.getElementById('apk-top-bar');
+      const iframeContainer = document.getElementById('iframe-container');
+      const btnClose = document.getElementById('btn-close-apk');
       const isAndroid = /Android/i.test(navigator.userAgent);
 
-      // Tampilkan banner jika diakses lewat HP Android dan belum pernah ditutup
-      if (isAndroid && !sessionStorage.getItem('apkBannerDismissed')) {
-        apkBanner.style.display = 'block';
+      if (isAndroid && !sessionStorage.getItem('apkBarDismissed')) {
+        topBar.style.display = 'block';
+        // Sesuaikan tinggi iframe agar tidak terpotong header
+        iframeContainer.style.height = 'calc(100% - ' + topBar.offsetHeight + 'px)';
       }
 
-      btnCloseApk.addEventListener('click', () => {
-        apkBanner.style.display = 'none';
-        sessionStorage.setItem('apkBannerDismissed', 'true');
+      btnClose.addEventListener('click', () => {
+        topBar.style.display = 'none';
+        iframeContainer.style.height = '100%';
+        sessionStorage.setItem('apkBarDismissed', 'true');
       });
     });
   </script>
